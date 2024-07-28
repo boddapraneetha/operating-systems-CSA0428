@@ -1,0 +1,87 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <sys/stat.h>
+
+#define FILENAME "example.txt"
+#define BUFFER_SIZE 1024
+
+void create_and_write_file() {
+    int fd;
+    const char *data = "Hello, this is a sample text for file management demonstration.\n";
+
+    // Create and open the file for writing
+    fd = open(FILENAME, O_WRONLY | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR);
+    if (fd == -1) {
+        perror("Error opening file for writing");
+        exit(EXIT_FAILURE);
+    }
+    printf("File created and opened for writing successfully.\n");
+
+    // Write data to the file
+    if (write(fd, data, strlen(data)) == -1) {
+        perror("Error writing to file");
+        close(fd);
+        exit(EXIT_FAILURE);
+    }
+    printf("Data written to file successfully.\n");
+
+    // Close the file
+    close(fd);
+}
+
+void read_file() {
+    int fd;
+    char buffer[BUFFER_SIZE];
+    ssize_t bytes_read;
+
+    // Open the file for reading
+    fd = open(FILENAME, O_RDONLY);
+    if (fd == -1) {
+        perror("Error opening file for reading");
+        exit(EXIT_FAILURE);
+    }
+    printf("File opened for reading successfully.\n");
+
+    // Read data from the file
+    while ((bytes_read = read(fd, buffer, sizeof(buffer) - 1)) > 0) {
+        buffer[bytes_read] = '\0'; // Null-terminate the buffer
+        printf("%s", buffer);
+    }
+    if (bytes_read == -1) {
+        perror("Error reading from file");
+        close(fd);
+        exit(EXIT_FAILURE);
+    }
+
+    // Close the file
+    close(fd);
+}
+
+void get_file_status() {
+    struct stat file_stat;
+
+    // Get file status information
+    if (stat(FILENAME, &file_stat) == -1) {
+        perror("Error getting file status");
+        exit(EXIT_FAILURE);
+    }
+
+    // Display file status information
+    printf("File size: %ld bytes\n", file_stat.st_size);
+    printf("Number of links: %ld\n", file_stat.st_nlink);
+    printf("File permissions: %o\n", file_stat.st_mode);
+    printf("Last access time: %ld\n", file_stat.st_atime);
+    printf("Last modification time: %ld\n", file_stat.st_mtime);
+    printf("Last status change time: %ld\n", file_stat.st_ctime);
+}
+
+int main() {
+    // Perform file operations
+    create_and_write_file();
+    read_file();
+    get_file_status();
+
+    return 0;
+}
