@@ -1,0 +1,46 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define FILENAME "example.txt"
+
+void create_and_write_file() {
+    FILE *file = fopen(FILENAME, "w"); 
+    if (file == NULL) {
+        perror("Error opening file for writing");
+        exit(EXIT_FAILURE);
+    }
+    fprintf(file, "Hello, World!\n");
+    fprintf(file, "This is a test file.\n");
+    fclose(file);
+    printf("File created and written successfully.\n");
+}
+
+void read_file() {
+    FILE *file = fopen(FILENAME, "r");
+    if (file == NULL) {
+        perror("Error opening file for reading");
+        exit(EXIT_FAILURE);
+    }
+    char buffer[256];
+    printf("Contents of the file:\n");
+    while (fgets(buffer, sizeof(buffer), file) != NULL) {
+        printf("%s", buffer); 
+    }
+    fclose(file); 
+}
+
+void delete_file() {
+    if (remove(FILENAME) == 0) { 
+        printf("File deleted successfully.\n");
+    } else {
+        perror("Error deleting file");
+        exit(EXIT_FAILURE);
+    }
+}
+
+int main() {
+    create_and_write_file(); 
+    read_file(); 
+    delete_file(); 
+    return 0;
+}
