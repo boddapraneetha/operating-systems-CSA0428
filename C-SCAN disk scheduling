@@ -1,0 +1,91 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+void sort(int arr[], int n) {
+    int temp;
+    for(int i = 0; i < n-1; i++) {
+        for(int j = 0; j < n-i-1; j++) {
+            if(arr[j] > arr[j+1]) {
+                temp = arr[j];
+                arr[j] = arr[j+1];
+                arr[j+1] = temp;
+            }
+        }
+    }
+}
+
+void cscanDiskScheduling(int requests[], int n, int head, int diskSize) {
+    int totalSeekCount = 0;
+    int distance, curTrack;
+    int seekSequence[n+2]; 
+    int index = 0;
+
+    sort(requests, n);
+
+    int headIndex = 0;
+    for(int i = 0; i < n; i++) {
+        if(head < requests[i]) {
+            headIndex = i;
+            break;
+        }
+    }
+
+    for(int i = headIndex; i < n; i++) {
+        curTrack = requests[i];
+        distance = abs(curTrack - head);
+        totalSeekCount += distance;
+        head = curTrack;
+        seekSequence[index++] = curTrack;
+    }
+
+    if(head != diskSize-1) {
+        distance = abs(diskSize-1 - head);
+        totalSeekCount += distance;
+        head = diskSize-1;
+        seekSequence[index++] = head;
+    }
+
+    distance = abs(diskSize-1 - 0);
+    totalSeekCount += distance;
+    head = 0;
+    seekSequence[index++] = head;
+
+    for(int i = 0; i < headIndex; i++) {
+        curTrack = requests[i];
+        distance = abs(curTrack - head);
+        totalSeekCount += distance;
+        head = curTrack;
+        seekSequence[index++] = curTrack;
+    }
+
+    printf("Seek Sequence is: ");
+    for(int i = 0; i < index; i++) {
+        printf("%d ", seekSequence[i]);
+    }
+    printf("\nTotal Seek Count: %d\n", totalSeekCount);
+}
+
+int main() {
+    int n; 
+    int head; 
+    int diskSize; 
+
+    printf("Enter the number of requests: ");
+    scanf("%d", &n);
+
+    int requests[n];
+    printf("Enter the request array: ");
+    for(int i = 0; i < n; i++) {
+        scanf("%d", &requests[i]);
+    }
+
+    printf("Enter the initial head position: ");
+    scanf("%d", &head);
+
+    printf("Enter the total size of the disk: ");
+    scanf("%d", &diskSize);
+
+    cscanDiskScheduling(requests, n, head, diskSize);
+
+    return 0;
+}
