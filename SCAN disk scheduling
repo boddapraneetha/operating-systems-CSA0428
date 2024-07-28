@@ -1,0 +1,111 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+void sort(int arr[], int n) 
+{
+    int temp;
+    for(int i = 0; i < n-1; i++) 
+	{
+        for(int j = 0; j < n-i-1; j++) 
+		{
+            if(arr[j] > arr[j+1]) 
+			{
+                temp = arr[j];
+                arr[j] = arr[j+1];
+                arr[j+1] = temp;
+            }
+        }
+    }
+}
+
+void scanDiskScheduling(int requests[], int n, int head, int direction) {
+    int totalSeekCount = 0;
+    int distance, curTrack;
+    int seekSequence[n+1]; 
+    int index = 0;
+
+    sort(requests, n);
+
+    int headIndex = 0;
+    for(int i = 0; i < n; i++) 
+	{
+        if(head < requests[i]) 
+		{
+            headIndex = i;
+            break;
+        }
+    }
+
+    if(direction == 1) 
+	{ 
+        for(int i = headIndex; i < n; i++) 
+		{
+            curTrack = requests[i];
+            distance = abs(curTrack - head);
+            totalSeekCount += distance;
+            head = curTrack;
+            seekSequence[index++] = curTrack;
+        }
+
+        for(int i = headIndex-1; i >= 0; i--) 
+		{
+            curTrack = requests[i];
+            distance = abs(curTrack - head);
+            totalSeekCount += distance;
+            head = curTrack;
+            seekSequence[index++] = curTrack;
+        }
+    } else { 
+        for(int i = headIndex-1; i >= 0; i--) 
+		{
+            curTrack = requests[i];
+            distance = abs(curTrack - head);
+            totalSeekCount += distance;
+            head = curTrack;
+            seekSequence[index++] = curTrack;
+        }
+
+        for(int i = headIndex; i < n; i++) 
+		{
+            curTrack = requests[i];
+            distance = abs(curTrack - head);
+            totalSeekCount += distance;
+            head = curTrack;
+            seekSequence[index++] = curTrack;
+        }
+    }
+
+    printf("Seek Sequence is: ");
+    for(int i = 0; i < index; i++) 
+	{
+        printf("%d ", seekSequence[i]);
+    }
+    printf("\nTotal Seek Count: %d\n", totalSeekCount);
+}
+
+int main()
+ {
+    int n; 
+    int head; 
+    int direction;
+
+    printf("Enter the number of requests: ");
+    scanf("%d", &n);
+
+    int requests[n];
+    printf("Enter the request array: ");
+    for(int i = 0; i < n; i++) 
+	{
+        scanf("%d", &requests[i]);
+    }
+
+    printf("Enter the initial head position: ");
+    scanf("%d", &head);
+
+    printf("Enter the direction (0 for left, 1 for right): ");
+    scanf("%d", &direction);
+
+    scanDiskScheduling(requests, n, head, direction);
+
+    return 0;
+}
