@@ -1,0 +1,85 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <errno.h>
+
+void printPermissions(struct stat fileStat) {
+    printf("File Permissions: \t");
+    printf((S_ISDIR(fileStat.st_mode)) ? "d" : "-");
+    printf((fileStat.st_mode & S_IRUSR) ? "r" : "-");
+    printf((fileStat.st_mode & S_IWUSR) ? "w" : "-");
+    printf((fileStat.st_mode & S_IXUSR) ? "x" : "-");
+    printf("\n");
+}
+
+void demonstratePermissions(const char* filename) {
+    struct stat fileStat;
+
+    if (stat(filename, &fileStat) < 0) {
+        perror("stat");
+        return;
+    }
+
+    printPermissions(fileStat);
+
+    printf("Changing file permissions to rw-r--r--\n");
+    if (chmod(filename, S_IRUSR | S_IWUSR) < 0) {
+        perror("chmod");
+        return;
+    }
+
+    if (stat(filename, &fileStat) < 0) {
+        perror("stat");
+        return;
+    }
+
+    printPermissions(fileStat);
+
+    printf("Changing file permissions to rwxr-xr-x\n");
+    if (chmod(filename, S_IRUSR | S_IWUSR | S_IXUSR) < 0) {
+        perror("chmod");
+        return;
+    }
+
+    if (stat(filename, &fileStat) < 0) {
+        perror("stat");
+        return;
+    }
+
+    printPermissions(fileStat);
+}
+
+int main() {
+    const char* filename = "testfile.txt";
+    int fd;
+
+    fd = open(filename, O_CREAT | O_WRONLY, S_IRUSR | S_IWUSR);
+    if (fd < 0) {
+        perror("open");
+        exit(EXIT_FAILURE);
+    }
+
+    if (write(fd, "Hello, World!\n", 14) != 14) {
+        perror("write");
+        close(fd);
+        exit(EXIT_FAILURE);
+    }
+
+    close(fd);
+
+    printf("File created and written successfully.\n");
+
+    demonstratePermissions(filename);
+
+    if (unlink(filename) < 0) {
+        perror("unlink");
+        exit(EXIT_FAILURE);
+    }
+
+    printf("File removed successfully.\n");
+
+    return 0;
+}
