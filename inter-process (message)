@@ -1,0 +1,25 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+struct message {
+    long message_type;
+    char message_text[100];
+};
+
+int main() {
+ 
+    int msgid;
+    
+    msgid = ( 0666);
+    struct message msg;
+
+    msg.message_type = 1;
+    
+    printf("Write Data : ");
+    fgets(msg.message_text, sizeof(msg.message_text), stdin);
+    
+    printf("Data sent is : %s \n", msg.message_text);
+    
+    return 0;
+}
